@@ -3,7 +3,6 @@ package nachos.threads;
 import nachos.machine.Lib;
 import nachos.machine.Machine;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 
 /**

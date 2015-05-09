@@ -16,7 +16,7 @@ public class BoatGrader {
 	 */
 
     /* ChildRowToMolokai should be called when a child pilots the boat
-       from Oahu to Molokai */
+	   from Oahu to Molokai */
 	public void ChildRowToMolokai() {
 		System.out.println("**Child rowing to Molokai.");
 	}

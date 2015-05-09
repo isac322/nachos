@@ -20,7 +20,7 @@ public class CoffSection {
 	 * @param firstVPN   the first virtual page number used by this.
 	 */
 	protected CoffSection(Coff coff, String name, boolean executable,
-	                      boolean readOnly, int numPages, int firstVPN) {
+						  boolean readOnly, int numPages, int firstVPN) {
 		this.coff = coff;
 		this.name = name;
 		this.executable = executable;
@@ -43,7 +43,7 @@ public class CoffSection {
 	 * @throws EOFException if an error occurs.
 	 */
 	public CoffSection(OpenFile file, Coff coff,
-	                   int headerOffset) throws EOFException {
+					   int headerOffset) throws EOFException {
 		this.file = file;
 		this.coff = coff;
 

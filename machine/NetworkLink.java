@@ -150,7 +150,7 @@ public class NetworkLink {
 	 *                                packet can be sent.
 	 */
 	public void setInterruptHandlers(Runnable receiveInterruptHandler,
-	                                 Runnable sendInterruptHandler) {
+									 Runnable sendInterruptHandler) {
 		this.receiveInterruptHandler = receiveInterruptHandler;
 		this.sendInterruptHandler = sendInterruptHandler;
 	}

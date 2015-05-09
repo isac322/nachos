@@ -101,7 +101,7 @@ public final class TCB {
 			});
 
 	    /* The Java thread hasn't yet started, but we need to get it
-	     * blocking in yield(). We do this by temporarily turning off the
+		 * blocking in yield(). We do this by temporarily turning off the
 	     * current TCB, starting the new Java thread, and waiting for it
 	     * to wake us up from threadroot(). Once the new TCB wakes us up,
 	     * it's safe to context switch to the new TCB.

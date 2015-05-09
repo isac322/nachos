@@ -8,6 +8,31 @@ import nachos.threads.Lock;
 public class PrioritySchedulerGrader extends BasicTestGrader {
 	@Override
 	public void run() {
+		boolean insStatus = Machine.interrupt().disable();
+		KThread mainThread = KThread.currentThread();
+		ThreadHandler midThread = forkNewThread(new Runnable() {
+			@Override
+			public void run() {
+				for (int i = 0; i < 10; i++) {
+					System.out.println(fibonacci(20 + i));
+				}
+			}
+		}, 5);
+		midThread.thread.setName("while");
+
+		Machine.interrupt().restore(insStatus);
+
+		midThread.thread.join();
+		KThread.yield();
+		done();
+	}
+
+	private long fibonacci(int n) {
+		if (n < 2) return 1;
+		return fibonacci(n - 1) + fibonacci(n - 2);
+	}
+
+	private void test1() {
 		Lock lock = new Lock();
 		lock.acquire();
 

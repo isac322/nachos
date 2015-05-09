@@ -37,7 +37,7 @@ public class StandardConsole implements SerialConsole {
 	}
 
 	public final void setInterruptHandlers(Runnable receiveInterruptHandler,
-	                                       Runnable sendInterruptHandler) {
+										   Runnable sendInterruptHandler) {
 		this.receiveInterruptHandler = receiveInterruptHandler;
 		this.sendInterruptHandler = sendInterruptHandler;
 	}

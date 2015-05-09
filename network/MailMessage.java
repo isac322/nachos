@@ -20,7 +20,7 @@ public class MailMessage {
 	 * @param contents the contents of the packet.
 	 */
 	public MailMessage(int dstLink, int dstPort, int srcLink, int srcPort,
-	                   byte[] contents) throws MalformedPacketException {
+					   byte[] contents) throws MalformedPacketException {
 		// make sure the paramters are valid
 		if (dstPort < 0 || dstPort >= portLimit ||
 				srcPort < 0 || srcPort >= portLimit ||

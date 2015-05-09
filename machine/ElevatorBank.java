@@ -52,7 +52,7 @@ public final class ElevatorBank implements Runnable {
 	 * @param controller   the elevator controller.
 	 */
 	public void init(int numElevators, int numFloors,
-	                 ElevatorControllerInterface controller) {
+					 ElevatorControllerInterface controller) {
 		Lib.assertTrue(!simulationStarted);
 
 		this.numElevators = numElevators;
@@ -82,7 +82,7 @@ public final class ElevatorBank implements Runnable {
 	 * @return the controls that will be given to the rider.
 	 */
 	public RiderControls addRider(RiderInterface rider,
-	                              int floor, int[] stops) {
+								  int floor, int[] stops) {
 		Lib.assertTrue(!simulationStarted);
 
 		RiderControls controls = new RiderState(rider, floor, stops);

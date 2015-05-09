@@ -420,7 +420,7 @@ public final class Processor {
 	 *                       <tt>nextLoadTarget</tt> will not be written.
 	 */
 	private void delayedLoad(int nextLoadTarget, int nextLoadValue,
-	                         int nextLoadMask) {
+							 int nextLoadMask) {
 		// complete previous delayed load, if not modifying r0
 		if (loadTarget != 0) {
 			int savedBits = registers[loadTarget] & ~loadMask;

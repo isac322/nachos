@@ -175,7 +175,7 @@ public final class Lib {
 	 * @param length   the number of bytes to read.
 	 */
 	public static void strictReadFile(OpenFile file, int position,
-	                                  byte[] buf, int offset, int length) {
+									  byte[] buf, int offset, int length) {
 		long startTime = Machine.timer().getTime();
 		assertTrue(file.read(position, buf, offset, length) == length);
 		long finishTime = Machine.timer().getTime();
@@ -271,7 +271,7 @@ public final class Lib {
 	 * @param value  the value to convert.
 	 */
 	public static void bytesFromInt(byte[] array, int offset,
-	                                int length, int value) {
+									int length, int value) {
 		assertTrue(length == 1 || length == 2 || length == 4);
 
 		switch (length) {
@@ -553,7 +553,7 @@ public final class Lib {
 	 * @param returnType     the required return type.
 	 */
 	public static void checkMethod(Class cls, String methodName,
-	                               Class[] parameterTypes, Class returnType) {
+								   Class[] parameterTypes, Class returnType) {
 		try {
 			Lib.assertTrue(Modifier.isPublic(cls.getModifiers()));
 			Method method = cls.getMethod(methodName, parameterTypes);
@@ -576,8 +576,8 @@ public final class Lib {
 	 * @param returnType     the required return type.
 	 */
 	public static void checkStaticMethod(Class cls, String methodName,
-	                                     Class[] parameterTypes,
-	                                     Class returnType) {
+										 Class[] parameterTypes,
+										 Class returnType) {
 		try {
 			Lib.assertTrue(Modifier.isPublic(cls.getModifiers()));
 			Method method = cls.getMethod(methodName, parameterTypes);
@@ -598,7 +598,7 @@ public final class Lib {
 	 * @param fieldType the required type.
 	 */
 	public static void checkField(Class cls, String fieldName,
-	                              Class fieldType) {
+								  Class fieldType) {
 		try {
 			Lib.assertTrue(Modifier.isPublic(cls.getModifiers()));
 			Field field = cls.getField(fieldName);
@@ -620,7 +620,7 @@ public final class Lib {
 	 * @param fieldType the required type.
 	 */
 	public static void checkStaticField(Class cls, String fieldName,
-	                                    Class fieldType) {
+										Class fieldType) {
 		try {
 			Lib.assertTrue(Modifier.isPublic(cls.getModifiers()));
 			Field field = cls.getField(fieldName);

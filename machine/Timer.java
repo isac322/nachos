@@ -22,14 +22,11 @@ public final class Timer {
 	 *                  machine.
 	 */
 	public Timer(Privilege privilege) {
-		System.out.print(" timer");
-
 		this.privilege = privilege;
 
 		timerInterrupt = new Runnable() {
 			public void run() {
 				timerInterrupt();
-				System.out.println("ddx");
 			}
 		};
 
