@@ -4,32 +4,14 @@ import nachos.machine.Lib;
 import nachos.machine.Machine;
 import nachos.threads.KThread;
 import nachos.threads.Lock;
+import nachos.threads.ThreadedKernel;
 
 public class PrioritySchedulerGrader extends BasicTestGrader {
 	@Override
 	public void run() {
-		boolean insStatus = Machine.interrupt().disable();
-		KThread mainThread = KThread.currentThread();
-		ThreadHandler midThread = forkNewThread(new Runnable() {
-			@Override
-			public void run() {
-				for (int i = 0; i < 10; i++) {
-					System.out.println(fibonacci(20 + i));
-				}
-			}
-		}, 5);
-		midThread.thread.setName("while");
+		test1();
 
-		Machine.interrupt().restore(insStatus);
-
-		midThread.thread.join();
-		KThread.yield();
 		done();
-	}
-
-	private long fibonacci(int n) {
-		if (n < 2) return 1;
-		return fibonacci(n - 1) + fibonacci(n - 2);
 	}
 
 	private void test1() {
@@ -38,59 +20,123 @@ public class PrioritySchedulerGrader extends BasicTestGrader {
 
 		boolean insStatus = Machine.interrupt().disable();
 
-		ThreadHandler lockThread = forkNewThread(new Runnable() {
+		forkNewThread(new Runnable() {
 			@Override
 			public void run() {
 				lock.acquire();
 				lock.release();
-				done();
 			}
-		}, 3);
-		lockThread.thread.setName("Locked thread");
+		}, 3, "Locked thread");
 
-		ThreadHandler midThread = forkNewThread(new Runnable() {
+		forkNewThread(new Runnable() {
 			@Override
 			public void run() {
-				alwaysYield(4);
+				alwaysYield(3);
+				System.out.println("in1");
 				Lib.assertTrue(false, "priority donation error");
 			}
-		}, 2);
-		midThread.thread.setName("Mid priority thread");
+		}, 2, "Mid priority thread");
 
-		ThreadHandler lowThread = forkNewThread(new Runnable() {
+		forkNewThread(new Runnable() {
 			@Override
 			public void run() {
-				alwaysYield(4);
+				alwaysYield(3);
+				System.out.println("in1");
 				Lib.assertTrue(false, "priority donation error");
 			}
-		}, 1);
-		lowThread.thread.setName("Low priority thread");
+		}, 1, "Low priority thread");
 
 		Machine.interrupt().restore(insStatus);
 
 		alwaysYield(3);
+		lock.release();
+	}
 
-		insStatus = Machine.interrupt().disable();
+	private void test3() {
+		Lock l1 = new Lock(), l2 = new Lock(), l3 = new Lock();
 
-		ThreadHandler LockThread2 = forkNewThread(new Runnable() {
+		boolean insStatus = Machine.interrupt().disable();
+		ThreadedKernel.scheduler.setPriority(1);
+
+		forkNewThread(new Runnable() {
 			@Override
 			public void run() {
-				lock.acquire();
-				System.out.println("in");
-				lock.release();
+				alwaysYield(3);
 			}
-		}, 4);
-		lowThread.thread.setName("Low priority thread2");
+		}, 1, "T1");
+
+		final ThreadHandler t2 = forkNewThread(new Runnable() {
+			@Override
+			public void run() {
+				boolean intStatus = Machine.interrupt().disable();
+				ThreadedKernel.scheduler.setPriority(2);
+				Machine.interrupt().restore(intStatus);
+
+				l2.acquire();
+				l1.acquire();
+
+				l1.release();
+				l2.release();
+			}
+		}, 2, "T2");
+
+		forkNewThread(new Runnable() {
+			@Override
+			public void run() {
+				l3.acquire();
+
+				boolean intStatus = Machine.interrupt().disable();
+				ThreadedKernel.scheduler.setPriority(3);
+				Machine.interrupt().restore(intStatus);
+
+				KThread.yield();
+				l2.acquire();
+
+				l2.release();
+				l3.release();
+			}
+		}, 7, "T3");
+
+		forkNewThread(new Runnable() {
+			@Override
+			public void run() {
+				boolean intStatus = Machine.interrupt().disable();
+				ThreadedKernel.scheduler.setPriority(t2.thread, 7);
+				Machine.interrupt().restore(intStatus);
+
+				l3.acquire();
+				System.out.println("in");
+				l3.release();
+			}
+		}, 5, "T5");
 
 		Machine.interrupt().restore(insStatus);
 
-		lock.release();
+		l1.acquire();
 		KThread.yield();
+
+		l1.release();
+
+		alwaysYield(3);
 	}
 
 	private void alwaysYield(int n) {
 		for (int i = 0; i < n; ++i) {
 			KThread.yield();
 		}
+	}
+
+	protected ThreadHandler forkNewThread(Runnable threadContent, int priority, String name) {
+		KThread thread = new KThread(threadContent);
+		ThreadHandler handler = getThreadHandler(thread);
+
+		thread.setName(name);
+
+		boolean intStatus = Machine.interrupt().disable();
+		ThreadedKernel.scheduler.setPriority(thread, priority);
+		thread.fork();
+		Machine.interrupt().restore(intStatus);
+
+		return handler;
 	}
 }

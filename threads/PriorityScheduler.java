@@ -167,20 +167,21 @@ public class PriorityScheduler extends Scheduler {
 		 * return.
 		 */
 		protected KThread pickNextThread() {
-
-			KThread result = null;
+			ThreadState result = null;
 			int maxPriority = 0;
 
-			for (KThread thread : waitQueue) {        // wait queue를 돌면서
-				int tmpPriority = getThreadState(thread).getEffectivePriority();    // thread의 effective priority
+			for (ThreadState state : waitQueue) {        			// wait queue를 돌면서
+				int tmpPriority = state.getEffectivePriority();		// thread의 effective priority
+//				System.out.println(state.thread + " is priority : " + tmpPriority);
 
-				if (result == null || maxPriority < tmpPriority) {    // 선택된게 없거나 가장 높은 우선숭위를 가진 thread를 선택
-					result = thread;
+				if (result == null || maxPriority < tmpPriority) {	// 선택된게 없거나 가장 높은 우선숭위를 가진 thread를 선택
+					result = state;
 					maxPriority = tmpPriority;
 				}
 			}
 
-			return result;
+			if (result == null) return null;
+			else return result.thread;
 		}
 
 		@Override
@@ -188,8 +189,8 @@ public class PriorityScheduler extends Scheduler {
 			Lib.assertTrue(Machine.interrupt().disabled());
 
 			System.out.print("\tPriority Queue : ");
-			for (KThread thread : waitQueue) {
-				System.out.print(thread + " ");
+			for (ThreadState state : waitQueue) {
+				System.out.print(state.thread + " ");
 			}
 			System.out.println("");
 		}
@@ -200,8 +201,7 @@ public class PriorityScheduler extends Scheduler {
 		 */
 		public boolean transferPriority;
 
-		protected ThreadState lastThread = null;
-		protected LinkedList<KThread> waitQueue = new LinkedList<>();
+		protected LinkedList<ThreadState> waitQueue = new LinkedList<>();
 	}
 
 	/**
@@ -239,13 +239,17 @@ public class PriorityScheduler extends Scheduler {
 		 * @return the effective priority of the associated thread.
 		 */
 		public int getEffectivePriority() {
-			int effectivePriority = priority;
+			int effectivePriority = priority;		// effectivePriority를 priority로 초기화
 
-			for (KThread donationThread : donationQueue) {        // donation할 queue를 모두 돌아보며
-				int p = getThreadState(donationThread).getPriority();    // donationThread의 priority
+			for (PriorityQueue queue : donationQueue) {		// 자신이 donation 받아야 할 queue를 돌면서
+				if (queue.transferPriority) {				// 그 queue가 donation을 허락한다면
+					for (ThreadState state : queue.waitQueue) {		// 그 queue의 모든 thread들을 돌면서
+						int tmp = state.getPriority();				// priority를 구하고
 
-				if (p > effectivePriority) {        // 더 높은 우선순위일 경우 donate
-					effectivePriority = p;
+						if (tmp > effectivePriority) {				// effectivePriority보다 크다면
+							effectivePriority = tmp;				// effectivePriority를 바꿈
+						}
+					}
 				}
 			}
 
@@ -276,16 +280,9 @@ public class PriorityScheduler extends Scheduler {
 		 * @see nachos.threads.ThreadQueue#waitForAccess
 		 */
 		public void waitForAccess(PriorityQueue waitQueue) {
-			if (waitQueue.lastThread != null
-					&& waitQueue.lastThread.thread == thread) {     // 돌던 thread가 wait하는 경우소 (lock됨)
-				for (KThread waitThread : waitQueue.waitQueue) {    // priority queue의 모든 thread에 donation 알림
-					ThreadState state = getThreadState(waitThread);
-					state.donationQueue.add(thread);
-				}
-				locked = true;      // lock상태로 바꿈
-			}
+//			System.out.println("\tthread " + thread + " added to queue : " + waitQueue);
 
-			waitQueue.waitQueue.add(thread);        // 기다리는 queue에 추가
+			waitQueue.waitQueue.add(this);        // 기다리는 queue에 추가
 		}
 
 		/**
@@ -299,19 +296,9 @@ public class PriorityScheduler extends Scheduler {
 		 * @see nachos.threads.ThreadQueue#nextThread
 		 */
 		public void acquire(PriorityQueue waitQueue) {
-			waitQueue.waitQueue.remove(thread);        // 이 thread가 기다리던 queue에서 제거
-
-			if (locked) {        // lock됐다가 깨어났을때
-				locked = false;  // 상태를 locked이 아니게 바꾸고
-				for (KThread waitThread : waitQueue.waitQueue) {    // priority queue의 모든 thread에 donation취소
-					ThreadState state = getThreadState(waitThread);
-					if (state.donationQueue.contains(thread)) {
-						state.donationQueue.remove(thread);
-					}
-				}
-			}
-
-			waitQueue.lastThread = this;            // 이 thread가 선택됨을 알림
+			waitQueue.waitQueue.remove(this);		// 이 thread가 기다리던 queue에서 제거
+//			System.out.println("\tthread " + thread + " deleted in queue : " + waitQueue);
+			donationQueue.add(waitQueue);			// 이 thread가 기다리던 queue에게서 donation받아야함을 표시
 		}
 
 		/**
@@ -325,7 +312,6 @@ public class PriorityScheduler extends Scheduler {
 		/**
 		 * 이 thread가 donation 받아야 할 큐
 		 */
-		protected LinkedList<KThread> donationQueue = new LinkedList<>();
-		protected boolean locked = false;
+		protected LinkedList<PriorityQueue> donationQueue = new LinkedList<>();
 	}
 }

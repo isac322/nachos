@@ -59,7 +59,6 @@ public class Lock {
 		boolean intStatus = Machine.interrupt().disable();
 
 		if ((lockHolder = waitQueue.nextThread()) != null) {
-			System.out.println("next");
 			lockHolder.ready();
 		}
 
@@ -76,6 +75,5 @@ public class Lock {
 	}
 
 	private KThread lockHolder = null;
-	private ThreadQueue waitQueue =
-			ThreadedKernel.scheduler.newThreadQueue(true);
+	private ThreadQueue waitQueue = ThreadedKernel.scheduler.newThreadQueue(true);
 }

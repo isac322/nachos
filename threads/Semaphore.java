@@ -97,6 +97,5 @@ public class Semaphore {
 	}
 
 	private int value;
-	private ThreadQueue waitQueue =
-			ThreadedKernel.scheduler.newThreadQueue(false);
+	private ThreadQueue waitQueue = ThreadedKernel.scheduler.newThreadQueue(false);
 }
