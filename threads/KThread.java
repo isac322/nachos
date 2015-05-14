@@ -420,16 +420,8 @@ public class KThread {
 
 		@Override
 		public void run() {
-			Object o = KThread.currentThread().schedulingState;
-			if (o instanceof PriorityScheduler.ThreadState) {
-				PriorityScheduler.ThreadState s = (PriorityScheduler.ThreadState) o;
-				s.setPriority(which + 1);
-			}
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 5; i++) {
 				System.out.println("*** thread " + which + " looped " + i + " times");
-//				boolean state = Machine.interrupt().disable();
-//				readyQueue.print();
-//				Machine.interrupt().restore(state);
 				KThread.yield();
 			}
 		}
